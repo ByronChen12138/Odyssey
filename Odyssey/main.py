@@ -10,6 +10,7 @@ mc_host = config.get('MC_SERVER_HOST')
 node_port = config.get('NODE_SERVER_PORT')
 embedding_dir = config.get('SENTENT_EMBEDDING_DIR')
 env_wait_ticks = 100
+
 def test_subgoal():
     odyssey_l3_8b = Odyssey(
         mc_port=mc_port,
@@ -52,6 +53,7 @@ def test_subgoal():
         except Exception as e:
             logger.critical(e)
             traceback.print_exc()
+
 def test_combat():
     odyssey_l3_8b_v3 = Odyssey(
         mc_port=mc_port,
