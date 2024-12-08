@@ -19,6 +19,10 @@ let bot = null;
 
 const app = express();
 
+let startTimestamp;
+let botInventory;
+let lastInventory = "{}";
+
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: false }));
 
@@ -49,7 +53,20 @@ app.post("/start", (req, res) => {
         bot.dismount();
     });
 
+    // Listen for chat messages
+    bot.on('chat', (username, message) => {
+        // Output the message to the given log file
+        fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/chat.log', `${Date.now() - startTimestamp} - ${username}: ${message}\n`);
+    });
+
+    // Listen on bot move
+    bot.on('move', () => {
+        fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/move.log', `${Date.now() - startTimestamp} - ${bot.entity.position}\n`);
+    });
+
     bot.once("spawn", async () => {
+        startTimestamp = Date.now();
+        botInventory = new Inventory(bot);
         bot.removeListener("error", onConnectionFailed);
         let itemTicks = 1;
         if (req.body.reset === "hard") {
@@ -220,6 +237,10 @@ app.post("/step", async (req, res) => {
                 bot.stuckTickCounter = 0;
             }
         }
+        if (JSON.stringify(botInventory.observe()) !== lastInventory) {
+            fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/inventory.log', `${Date.now() - startTimestamp} - ${JSON.stringify(botInventory.observe())}\n`);
+        }
+        lastInventory = JSON.stringify(botInventory.observe());
     }
 
     bot.on("physicTick", onTick);
