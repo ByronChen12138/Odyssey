@@ -31,15 +31,15 @@ def call_with_messages(msgs, model_name:ModelType=ModelType.LLAMA3_8B_V3):
         "user_prompt": msgs[1].content,
         "system_prompt": msgs[0].content
     }
-    # print(input_msg)
+    print(f"post to\n{url} with\n{input_msg}")
     result = requests.post(url, json = input_msg)
     # if result.status_code != HTTPStatus.OK:
     #     return AIMessage(content="")
     json_result = result.json()
     # if json_result['data'] is None:
     #     return AIMessage(content="")
-    # print(json_result)
-    return AIMessage(content=json_result["data"])
+    print(json_result)
+    return AIMessage(content=json_result["response"])
 
 def call_with_messages_(msgs):
     dashscope.api_key = config.get("api_key")  # API KEY

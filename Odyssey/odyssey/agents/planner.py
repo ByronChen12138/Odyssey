@@ -10,9 +10,9 @@ from odyssey.utils.json_utils import fix_and_parse_list, fix_and_parse_json
 # from langchain.schema import HumanMessage, SystemMessage
 # from langchain.vectorstores import Chroma
 
-from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.schema import HumanMessage, SystemMessage
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 from odyssey.utils.logger import get_logger
 
@@ -140,7 +140,7 @@ class PlannerAgent:
     def render_system_message(self, environment, goals):
         prompts = load_prompt(env_prompt[environment])
         if goals != None:
-            prompts = prompts.replace("```goals```", goals)
+            prompts = prompts.replace("```goals```", str(goals))
         
         system_message = SystemMessage(content=prompts)
         assert isinstance(system_message, SystemMessage)
@@ -235,7 +235,7 @@ class PlannerAgent:
         #         if i > 5:
         #             break
         if goals:
-            content += "Ultimate goal: " + goals +"\n"
+            content += "Ultimate goal: " + str(goals) +"\n"
             content += "Note that your proposed tasks should directly related to the goals!\n"
         for key in self.curriculum_observations:
             content += observation[key]
@@ -433,7 +433,7 @@ class PlannerAgent:
                 texts=[question],
             )
             U.dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
-            self.qa_cache_questions_vectordb.persist()
+            # self.qa_cache_questions_vectordb.persist()
             questions.append(question)
             answers.append(answer)
         assert len(questions_new) == len(questions) == len(answers)
@@ -454,7 +454,7 @@ class PlannerAgent:
                 texts=[question],
             )
             U.dump_json(self.qa_cache, f"{self.ckpt_dir}/curriculum/qa_cache.json")
-            self.qa_cache_questions_vectordb.persist()
+            # self.qa_cache_questions_vectordb.persist()
         context = f"Question: {question}\n{answer}"
         return context
 
@@ -518,7 +518,6 @@ class PlannerAgent:
         ]
         # self.logger.debug(f"Curriculum Agent Question: {question}")
         # qa_answer = self.qa_llm(messages).content
-        # ï¿????æ¹è°ï¿????
         qa_answer = call_with_messages(messages, model_name=self.qa_model_name).content
         # self.logger.debug(f"Curriculum Agent Answer: {qa_answer}")
         return qa_answer

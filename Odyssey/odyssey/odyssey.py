@@ -210,6 +210,8 @@ class Odyssey:
         )
         with Timer('retrieve skills'):
             self.skills = self.skill_manager.retrieve_skills(query=self.context)
+            if not self.skills:
+                self.skills = [[], []]
             self.logger.info(f"Render Action Agent system message with {len(self.skills[0])} skills")
         system_message = self.action_agent.render_system_message()
         human_message = self.action_agent.render_human_message(
@@ -391,6 +393,7 @@ class Odyssey:
                         reset_env=reset_env,
                     )
             except Exception as e:
+                self.logger.error(f"Error: {e}")
                 time.sleep(3)  # wait for mineflayer to exit
                 info = {
                     "task": task,

@@ -1,9 +1,9 @@
 import os
 
 import odyssey.utils as U
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.schema import HumanMessage, SystemMessage
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 
 from odyssey.prompts import load_prompt
 from odyssey.control_primitives import load_control_primitives
@@ -50,7 +50,7 @@ class SkillManager:
                     metadatas=[{"name": key}],
                 )
             
-            self.vectordb.persist()
+            # self.vectordb.persist()
         
         assert self.vectordb._collection.count() == len(self.skills), (
             f"Skill Manager's vectordb is not synced with skills.json.\n"
@@ -115,7 +115,7 @@ class SkillManager:
             f"{self.ckpt_dir}/skill/description/{dumped_program_name}.txt",
         )
         U.dump_json(self.skills, f"{self.ckpt_dir}/skill/skills.json")
-        self.vectordb.persist()
+        # self.vectordb.persist()
 
     def generate_skill_description(self, program_name, program_code):
         messages = [

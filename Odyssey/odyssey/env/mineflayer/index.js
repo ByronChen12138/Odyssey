@@ -19,6 +19,16 @@ let bot = null;
 
 const app = express();
 
+// Parse the id and task from the ./conf/config.json file
+const config = require("../../../conf/config.json");
+const ID = config.ID;
+const TASK = config.TASK;
+
+// Set up the path to the log files
+const CHAT_LOG_PATH = `./out/${TASK}/${TASK}_${ID}_chat.log`;
+const MOVE_LOG_PATH = `./out/${TASK}/${TASK}_${ID}_move.log`;
+const INVENTORY_LOG_PATH = `./out/${TASK}/${TASK}_${ID}_inventory.log`;
+
 let startTimestamp;
 let botInventory;
 let lastInventory = "{}";
@@ -56,12 +66,12 @@ app.post("/start", (req, res) => {
     // Listen for chat messages
     bot.on('chat', (username, message) => {
         // Output the message to the given log file
-        fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/chat.log', `${Date.now() - startTimestamp} - ${username}: ${message}\n`);
+        fs.appendFileSync(CHAT_LOG_PATH, `${Date.now() - startTimestamp} - ${username}: ${message}\n`);
     });
 
     // Listen on bot move
     bot.on('move', () => {
-        fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/move.log', `${Date.now() - startTimestamp} - ${bot.entity.position}\n`);
+        fs.appendFileSync(MOVE_LOG_PATH, `${Date.now() - startTimestamp} - ${bot.entity.position}\n`);
     });
 
     bot.once("spawn", async () => {
@@ -238,7 +248,7 @@ app.post("/step", async (req, res) => {
             }
         }
         if (JSON.stringify(botInventory.observe()) !== lastInventory) {
-            fs.appendFileSync('/Users/nosanq/Desktop/McGill/Graduated Study/Generative_Agents/Codes/Odyssey/Odyssey/out/inventory.log', `${Date.now() - startTimestamp} - ${JSON.stringify(botInventory.observe())}\n`);
+            fs.appendFileSync(INVENTORY_LOG_PATH, `${Date.now() - startTimestamp} - ${JSON.stringify(botInventory.observe())}\n`);
         }
         lastInventory = JSON.stringify(botInventory.observe());
     }
